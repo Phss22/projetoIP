@@ -7,7 +7,7 @@ pygame.init()
 
 #nome do jogo:
 pygame.display.set_caption("Jogo Snake Python")
-largura, altura = 800, 600
+largura, altura = 1280, 720
 tela = pygame.display.set_mode((largura, altura)) #setar o tamanho da tela
 relogio = pygame.time.Clock()
 
@@ -47,13 +47,13 @@ def selecionar_velocidade(tecla):
     if tecla == pygame.K_DOWN:
         velocidade_x = 0
         velocidade_y = tamanho_quadrado
-    elif tecla == pygame.K_UP:
+    if tecla == pygame.K_UP:
         velocidade_x = 0
         velocidade_y = -tamanho_quadrado
-    elif tecla == pygame.K_RIGHT:
+    if tecla == pygame.K_RIGHT:
         velocidade_x = tamanho_quadrado
         velocidade_y = 0
-    elif tecla == pygame.K_LEFT:
+    if tecla == pygame.K_LEFT:
         velocidade_x = -tamanho_quadrado
         velocidade_y = 0
 
