@@ -23,8 +23,8 @@ velocidade_jogo = 15
 
 #funcao para gerar comida:
 def gerar_comida():
-    comida_x = round(random.randrange(0, largura - tamanho_quadrado)/ 10.0) * 10.0 #esse 10.0, precisa ser exatamnete do tamanho do quadrado
-    comida_y = round(random.randrange(0, altura - tamanho_quadrado)/ 10.0) * 10.0
+    comida_x = round(random.randrange(0, largura - tamanho_quadrado) / 10.0) * 10.0 #esse 10.0, precisa ser exatamnete do tamanho do quadrado
+    comida_y = round(random.randrange(0, altura - tamanho_quadrado) / 10.0) * 10.0
     return comida_x, comida_y
 
 #funcao para desenhar a comida:
@@ -34,12 +34,12 @@ def desenhar_comida(tamanho, comida_x, comida_y):
 #funcao para desenhar cobra:
 def desenhar_cobra(tamanho, pixels):
     for pixel in pixels:
-        pygame.draw.rect(tela, branca,[pixel[0], pixel[1], tamanho, tamanho])
+        pygame.draw.rect(tela, branca, [pixel[0], pixel[1], tamanho, tamanho])
 
 #funcao para desenhar pontuacao:
 def desenhar_pontuacao(pontuacao):
     fonte = pygame.font.SysFont("Helvetica", 35)
-    texto = fonte.render(f"Potos: {pontuacao}", True, vermelha) #Truue é pra nao ficar pxelado
+    texto = fonte.render(f"Pontos: {pontuacao}", True, vermelha) #Truue é pra nao ficar pxelado
     tela.blit(texto, [1, 1])
 
 #funcao selecionar velocidade:
@@ -58,12 +58,13 @@ def selecionar_velocidade(tecla):
         velocidade_y = 0
 
     return velocidade_x, velocidade_y
+
 #funcao para rodar jogo(contem o loop do jogo):
 def rodar_jogo():
     fim_jogo = False
     #posicao inicial da cobra:
-    x = largura/2 
-    y = altura/2 
+    x = largura / 2 
+    y = altura / 2 
 
     #velocidades da cobra em relacao a pixels:
     velocidade_x = 0
@@ -85,15 +86,16 @@ def rodar_jogo():
             elif evento.type == pygame.KEYDOWN:
                 velocidade_x, velocidade_y = selecionar_velocidade(evento.key)
         
-        #desenhar comida:
-        desenhar_comida(tamanho_quadrado, comida_x, comida_y)
-
         #atualizar posicao da cobra:
-        if x < 0 or x >= largura or y < 0 or y >= altura:
-            fim_jogo = True 
-            
         x += velocidade_x
         y += velocidade_y
+
+        #verificar se a cobra bateu na borda:
+        if x < 0 or x >= largura or y < 0 or y >= altura:
+            fim_jogo = True 
+
+        #desenhar comida:
+        desenhar_comida(tamanho_quadrado, comida_x, comida_y)
 
         #desenhar cobra:
         pixels.append([x, y])
@@ -108,9 +110,6 @@ def rodar_jogo():
         desenhar_cobra(tamanho_quadrado, pixels)
         desenhar_pontuacao(tamanho_cobra - 1)
 
-
-
-
         #atualizar na tela:
         pygame.display.update()
 
@@ -119,3 +118,8 @@ def rodar_jogo():
             tamanho_cobra += 1 
             comida_x, comida_y = gerar_comida()
         relogio.tick(velocidade_jogo)
+    
+    pygame.quit()
+
+#rodar o jogo:
+rodar_jogo()
