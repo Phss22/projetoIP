@@ -1,48 +1,58 @@
-#configurações iniciais:
 import pygame
-import random 
+import random
 
-#iniciar jogo:
+# iniciar jogo:
 pygame.init()
 
-#nome do jogo:
+# nome do jogo:
 pygame.display.set_caption("Jogo Snake Python")
 largura, altura = 800, 600
-tela = pygame.display.set_mode((largura, altura)) #setar o tamanho da tela
+tela = pygame.display.set_mode((largura, altura)) # setar o tamanho da tela
 relogio = pygame.time.Clock()
 
-#cores:
+# cores:
 preta = (0, 0, 0)
 branca = (255, 255, 255)
-vermelha = (255, 0 , 0)
+vermelha = (255, 0, 0)
 verde = (0, 255, 0)
+amarela = (255, 255, 0)
 
-#parametros da cobrinha:
-tamanho_quadrado = 10 
-velocidade_jogo = 15 
+# parametros da cobrinha:
+tamanho_quadrado = 10
+velocidade_jogo = 15
 
-#funcao para gerar comida:
+# funcao para gerar comida:
 def gerar_comida():
-    comida_x = round(random.randrange(0, largura - tamanho_quadrado)/ 10.0) * 10.0 #esse 10.0, precisa ser exatamnete do tamanho do quadrado
-    comida_y = round(random.randrange(0, altura - tamanho_quadrado)/ 10.0) * 10.0
+    comida_x = round(random.randrange(0, largura - tamanho_quadrado) / 10.0) * 10.0 # esse 10.0, precisa ser exatamnete do tamanho do quadrado
+    comida_y = round(random.randrange(0, altura - tamanho_quadrado) / 10.0) * 10.0
     return comida_x, comida_y
 
-#funcao para desenhar a comida:
+# funcao para gerar bomba:
+def gerar_bomba():
+    bomba_x = round(random.randrange(0, largura - tamanho_quadrado) / 10.0) * 10.0
+    bomba_y = round(random.randrange(0, altura - tamanho_quadrado) / 10.0) * 10.0
+    return bomba_x, bomba_y
+
+# funcao para desenhar a comida:
 def desenhar_comida(tamanho, comida_x, comida_y):
     pygame.draw.rect(tela, verde, [comida_x, comida_y, tamanho, tamanho])
 
-#funcao para desenhar cobra:
+# funcao para desenhar bomba:
+def desenhar_bomba(tamanho, bomba_x, bomba_y):
+    pygame.draw.rect(tela, amarela, [bomba_x, bomba_y, tamanho, tamanho])
+
+# funcao para desenhar cobra:
 def desenhar_cobra(tamanho, pixels):
     for pixel in pixels:
-        pygame.draw.rect(tela, branca,[pixel[0], pixel[1], tamanho, tamanho])
+        pygame.draw.rect(tela, branca, [pixel[0], pixel[1], tamanho, tamanho])
 
-#funcao para desenhar pontuacao:
+# funcao para desenhar pontuacao:
 def desenhar_pontuacao(pontuacao):
     fonte = pygame.font.SysFont("Helvetica", 35)
-    texto = fonte.render(f"Potos: {pontuacao}", True, vermelha) #Truue é pra nao ficar pxelado
+    texto = fonte.render(f"Pontos: {pontuacao}", True, vermelha) # Truue é pra nao ficar pxelado
     tela.blit(texto, [1, 1])
 
-#funcao selecionar velocidade:
+# funcao selecionar velocidade:
 def selecionar_velocidade(tecla):
     if tecla == pygame.K_DOWN:
         velocidade_x = 0
@@ -58,64 +68,79 @@ def selecionar_velocidade(tecla):
         velocidade_y = 0
 
     return velocidade_x, velocidade_y
-#funcao para rodar jogo(contem o loop do jogo):
+
+# funcao para rodar jogo(contem o loop do jogo):
 def rodar_jogo():
     fim_jogo = False
-    #posicao inicial da cobra:
-    x = largura/2 
-    y = altura/2 
+    # posicao inicial da cobra:
+    x = largura / 2
+    y = altura / 2
 
-    #velocidades da cobra em relacao a pixels:
+    # velocidades da cobra em relacao a pixels:
     velocidade_x = 0
     velocidade_y = 0
 
-    tamanho_cobra = 1 
+    tamanho_cobra = 1
     pixels = []
 
-    #gerar comida, apenas uma inicialmente:
+    # gerar comida e bomba, apenas uma inicialmente:
     comida_x, comida_y = gerar_comida()
+    bomba_x, bomba_y = gerar_bomba()
 
     while not fim_jogo:
-        tela.fill(preta) #cor do fundo
+        tela.fill(preta) # cor do fundo
 
         for evento in pygame.event.get():
-            if evento.type == pygame.QUIT : #cabou o jogo
-                fim_jogo = True 
+            if evento.type == pygame.QUIT: # cabou o jogo
+                fim_jogo = True
             
             elif evento.type == pygame.KEYDOWN:
                 velocidade_x, velocidade_y = selecionar_velocidade(evento.key)
         
-        #desenhar comida:
-        desenhar_comida(tamanho_quadrado, comida_x, comida_y)
-
-        #atualizar posicao da cobra:
-        if x < 0 or x >= largura or y < 0 or y >= altura:
-            fim_jogo = True 
-            
+        # atualizar posicao da cobra:
         x += velocidade_x
         y += velocidade_y
 
-        #desenhar cobra:
+        # verificar se a cobra bateu na borda:
+        if x < 0 or x >= largura or y < 0 or y >= altura:
+            fim_jogo = True
+
+        # desenhar comida e bomba:
+        desenhar_comida(tamanho_quadrado, comida_x, comida_y)
+        desenhar_bomba(tamanho_quadrado, bomba_x, bomba_y)
+
+        # desenhar cobra:
         pixels.append([x, y])
-        if len(pixels) > tamanho_cobra: #nada mais que uma ilusao em relacao ao movimento da cobriha, deleta um pixel e aumenta outro
+        if len(pixels) > tamanho_cobra: # nada mais que uma ilusao em relacao ao movimento da cobriha, deleta um pixel e aumenta outro
             del pixels[0]
 
-        #verificar se ele tá batendo:
-        for pixel in pixels[:-1]: #tirar o ultimo eleemento da lista
+        # verificar se ele tá batendo:
+        for pixel in pixels[:-1]: # tirar o ultimo eleemento da lista
             if pixel == [x, y]:
                 fim_jogo = True
         
         desenhar_cobra(tamanho_quadrado, pixels)
         desenhar_pontuacao(tamanho_cobra - 1)
 
-
-
-
-        #atualizar na tela:
+        # atualizar na tela:
         pygame.display.update()
 
-        #criar uma nova comida:
+        # criar uma nova comida:
         if x == comida_x and y == comida_y:
-            tamanho_cobra += 1 
+            tamanho_cobra += 1
             comida_x, comida_y = gerar_comida()
+
+        # verificar colisão com a bomba:
+        # fazer com que a bomba gere novamente toda vez q coma uma fruta
+        if x == bomba_x and y == bomba_y:
+            tamanho_cobra -= 1
+            bomba_x, bomba_y = gerar_bomba()
+            if tamanho_cobra == 0:
+                fim_jogo = True
+
         relogio.tick(velocidade_jogo)
+
+    pygame.quit()
+
+# rodar o jogo:
+rodar_jogo()
